@@ -39,7 +39,13 @@ class Ui(QtWidgets.QMainWindow):
             self.videoOnlyCheck.setChecked(False)
 
     def getOptions(self, location):
-        if self.audioOnlyCheck.isChecked() == True:
+        if self.audioOnlyCheck.isChecked() == False and self.videoOnlyCheck.isChecked() == False:
+            ydl_opts = {
+                'outtmpl': location,
+            }
+            return ydl_opts
+
+        elif self.audioOnlyCheck.isChecked() == True:
             ydl_opts = {
                 'format': 'bestaudio/best',
                 'outtmpl': location,
@@ -48,6 +54,7 @@ class Ui(QtWidgets.QMainWindow):
                 'noplaylist': True
             }
             return ydl_opts
+
         elif self.videoOnlyCheck.isChecked() == True:
             ydl_opts = {
                 'format': 'bestvideo/best',
