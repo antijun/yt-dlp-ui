@@ -47,7 +47,7 @@ class Ui(QtWidgets.QMainWindow):
                 'videoformat': "mp4",
                 'noplaylist': True
             }
-            return ydl_opts
+        return ydl_opts
 
 
 app = QtWidgets.QApplication(sys.argv)
