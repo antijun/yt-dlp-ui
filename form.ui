@@ -47,17 +47,17 @@
    </property>
    <item>
     <property name="text">
-     <string>1080p</string>
+     <string>1080p (mp4)</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>720p</string>
+     <string>1080p (webm)</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>480p</string>
+     <string>720p (mp4)</string>
     </property>
    </item>
   </widget>
