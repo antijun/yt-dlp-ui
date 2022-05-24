@@ -12,19 +12,35 @@ class Ui(QtWidgets.QMainWindow):
         super(Ui, self).__init__()
         uic.loadUi('form.ui', self)
         self.show()
+        self.setWindowTitle("yt-dlp Media Downloader")
         self.downloadButton.clicked.connect(self.startDownload)
         self.videoOnlyCheck.toggled.connect(self.video_exclusiveCheck)
         self.audioOnlyCheck.toggled.connect(self.audio_exclusiveCheck)
         self.setDownload.clicked.connect(self.set_downloadLocation)
+        self.checkLinkButton.clicked.connect(self.checkLinkDisplay)
 
     def getLink(self):
         link = self.enterLink.text()
         return link
 
+    def checkLinkValid(self):
+        URL = self.getLink()
+        ydl = YoutubeDL()
+        try:
+            r = ydl.extract_info(URL, download=False)
+            return True
+        except:
+            errorBox = QMessageBox()
+            errorBox.setWindowTitle("Error")
+            errorBox.setText("Invalid Link!")
+            errorBox.setIcon(QMessageBox.Critical)
+            errorBox.exec_()
+
     def startDownload(self):
         URL = self.getLink()
         with YoutubeDL(self.getOptions(self.set_downloadLocation())) as ydl:
             ydl.download(URL)
+            
 
     def set_downloadLocation(self):
         location = 'downloads/%(title)s.%(ext)s'
