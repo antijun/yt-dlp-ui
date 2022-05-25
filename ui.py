@@ -17,7 +17,7 @@ class Ui(QtWidgets.QMainWindow):
         self.videoOnlyCheck.toggled.connect(self.video_exclusiveCheck)
         self.audioOnlyCheck.toggled.connect(self.audio_exclusiveCheck)
         self.setDownload.clicked.connect(self.set_downloadLocation)
-        self.checkLinkButton.clicked.connect(self.checkLinkDisplay)
+        self.checkLinkButton.clicked.connect(self.checkLinkValid)
 
     def getLink(self):
         link = self.enterLink.text()
