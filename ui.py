@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, uic
+import urllib.request
 
 
 class Ui(QtWidgets.QMainWindow):
@@ -18,7 +19,17 @@ class Ui(QtWidgets.QMainWindow):
         self.audioOnlyCheck.toggled.connect(self.audio_exclusiveCheck)
         self.setDownload.clicked.connect(self.set_downloadLocation)
         self.checkLinkButton.clicked.connect(self.checkLinkValid)
+        self.formatSelectList.insertItem(0, "1080p (mp4)")
+        self.formatSelectList.insertItem(1, "1080p (webm)")
 
+        urllib.request.urlretrieve("https://i.ytimg.com/vi_webp/-GEHyAfV4OI/sddefault.webp", "tempThumbnail.jpg")
+        thumbnail = QPixmap("tempThumbnail.jpg")
+        thumbnail = thumbnail.scaled(288, 162)
+        self.imageLabel.setPixmap(thumbnail)
+        
+    def updateThumbnail(self):
+        
+    
     def getLink(self):
         link = self.enterLink.text()
         return link

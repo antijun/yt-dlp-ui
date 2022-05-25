@@ -26,13 +26,23 @@
     <string>Start Download</string>
    </property>
   </widget>
-  <widget class="QListView" name="formatListView">
+  <widget class="QListWidget" name="formatSelectList">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>250</y>
+     <width>261</width>
+     <height>290</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="imageLabel">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>261</width>
-     <height>521</height>
+     <width>288</width>
+     <height>162</height>
     </rect>
    </property>
   </widget>
@@ -40,7 +50,7 @@
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>110</y>
+     <y>330</y>
      <width>351</width>
      <height>41</height>
     </rect>
@@ -65,7 +75,7 @@
    <property name="geometry">
     <rect>
      <x>290</x>
-     <y>190</y>
+     <y>410</y>
      <width>91</width>
      <height>22</height>
     </rect>
@@ -94,7 +104,7 @@
    <property name="geometry">
     <rect>
      <x>290</x>
-     <y>160</y>
+     <y>380</y>
      <width>81</width>
      <height>22</height>
     </rect>
@@ -107,9 +117,9 @@
    <property name="geometry">
     <rect>
      <x>279</x>
-     <y>70</y>
+     <y>290</y>
      <width>351</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -133,7 +143,7 @@
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>30</y>
+     <y>250</y>
      <width>351</width>
      <height>31</height>
     </rect>
