@@ -18,17 +18,29 @@ class Ui(QtWidgets.QMainWindow):
         self.videoOnlyCheck.toggled.connect(self.video_exclusiveCheck)
         self.audioOnlyCheck.toggled.connect(self.audio_exclusiveCheck)
         self.setDownload.clicked.connect(self.set_downloadLocation)
-        self.checkLinkButton.clicked.connect(self.checkLinkValid)
-        self.formatSelectList.insertItem(0, "1080p (mp4)")
-        self.formatSelectList.insertItem(1, "1080p (webm)")
-
-        urllib.request.urlretrieve("https://i.ytimg.com/vi_webp/-GEHyAfV4OI/sddefault.webp", "tempThumbnail.jpg")
+        self.checkLinkButton.clicked.connect(self.updateVideoData)
+        quit = QAction("Quit", self)
+        quit.triggered.connect(self.closeEvent)
+        
+    def updateVideoData(self):
+        r = self.checkLinkValid()
+        urllib.request.urlretrieve(r['thumbnail'], "tempThumbnail.jpg")
         thumbnail = QPixmap("tempThumbnail.jpg")
         thumbnail = thumbnail.scaled(288, 162)
         self.imageLabel.setPixmap(thumbnail)
-        
-    def updateThumbnail(self):
-        
+    
+        URL = self.getLink()
+        ydl = YoutubeDL()
+        ydl_opts = {
+            'listformats': True,
+        }
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download(URL)
+        self.formatSelectList.insertItem(0, "1080p (mp4)")
+        self.formatSelectList.insertItem(1, "1080p (webm)")
+
+    def closeEvent(self, event):
+        os.remove('tempThumbnail.jpg')
     
     def getLink(self):
         link = self.enterLink.text()
@@ -38,8 +50,8 @@ class Ui(QtWidgets.QMainWindow):
         URL = self.getLink()
         ydl = YoutubeDL()
         try:
-            r = ydl.extract_info(URL, download=False)
-            return True
+            infoList = ydl.extract_info(URL, download=False)
+            return infoList
         except:
             errorBox = QMessageBox()
             errorBox.setWindowTitle("Error")
@@ -52,7 +64,6 @@ class Ui(QtWidgets.QMainWindow):
         with YoutubeDL(self.getOptions(self.set_downloadLocation())) as ydl:
             ydl.download(URL)
             
-
     def set_downloadLocation(self):
         location = 'downloads/%(title)s.%(ext)s'
         return location
@@ -65,10 +76,17 @@ class Ui(QtWidgets.QMainWindow):
         if self.audioOnlyCheck.isChecked() == True:
             self.videoOnlyCheck.setChecked(False)
 
+    def progressUpdate(self, response):
+        if response["status"] == "downloading":
+            speed = response["speed"]
+            downloaded_percent = (response["downloaded_bytes"]*100)/response["total_bytes"]
+            self.downloadProgress.setValue(downloaded_percent)
+
     def getOptions(self, location):
         if self.audioOnlyCheck.isChecked() == False and self.videoOnlyCheck.isChecked() == False:
             ydl_opts = {
                 'outtmpl': location,
+                "progress_hooks": [self.progressUpdate],
             }
             return ydl_opts
 
@@ -90,7 +108,6 @@ class Ui(QtWidgets.QMainWindow):
                 'noplaylist': True
             }
             return ydl_opts
-
 
 app = QtWidgets.QApplication(sys.argv)
 window = Ui()
