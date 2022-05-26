@@ -79,8 +79,14 @@ class Ui(QtWidgets.QMainWindow):
     def progressUpdate(self, response):
         if response["status"] == "downloading":
             speed = response["speed"]
+            if speed != None:
+                speed = int(speed)
+                speed = speed/1024**2
+            elif speed is None:
+                pass
             downloaded_percent = (response["downloaded_bytes"]*100)/response["total_bytes"]
             self.downloadProgress.setValue(downloaded_percent)
+            self.speedLabel.setText(str(speed) + "Mb/s")
 
     def getOptions(self, location):
         if self.audioOnlyCheck.isChecked() == False and self.videoOnlyCheck.isChecked() == False:
