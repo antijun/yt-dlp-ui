@@ -6,6 +6,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets, uic
 import urllib.request
+import qdarkstyle
 
 
 class Ui(QtWidgets.QMainWindow):
@@ -21,14 +22,14 @@ class Ui(QtWidgets.QMainWindow):
         self.checkLinkButton.clicked.connect(self.updateVideoData)
         quit = QAction("Quit", self)
         quit.triggered.connect(self.closeEvent)
-        
+
     def updateVideoData(self):
         r = self.checkLinkValid()
         urllib.request.urlretrieve(r['thumbnail'], "tempThumbnail.jpg")
         thumbnail = QPixmap("tempThumbnail.jpg")
         thumbnail = thumbnail.scaled(288, 162)
         self.imageLabel.setPixmap(thumbnail)
-    
+
         URL = self.getLink()
         ydl = YoutubeDL()
         ydl_opts = {
@@ -41,7 +42,7 @@ class Ui(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         os.remove('tempThumbnail.jpg')
-    
+
     def getLink(self):
         link = self.enterLink.text()
         return link
@@ -63,7 +64,7 @@ class Ui(QtWidgets.QMainWindow):
         URL = self.getLink()
         with YoutubeDL(self.getOptions(self.set_downloadLocation())) as ydl:
             ydl.download(URL)
-            
+
     def set_downloadLocation(self):
         location = 'downloads/%(title)s.%(ext)s'
         return location
@@ -82,11 +83,15 @@ class Ui(QtWidgets.QMainWindow):
             if speed != None:
                 speed = int(speed)
                 speed = speed/1024**2
+                speed = round(speed, 2)
             elif speed is None:
                 pass
-            downloaded_percent = (response["downloaded_bytes"]*100)/response["total_bytes"]
+            downloaded_percent = (
+                response["downloaded_bytes"]*100)/response["total_bytes"]
             self.downloadProgress.setValue(downloaded_percent)
-            self.speedLabel.setText(str(speed) + "Mb/s")
+            self.speedLabel.setText(str(speed) + " MiB/s")
+        elif response['status'] == "finished":
+            self.downloadProgress.setValue(100)
 
     def getOptions(self, location):
         if self.audioOnlyCheck.isChecked() == False and self.videoOnlyCheck.isChecked() == False:
@@ -115,6 +120,8 @@ class Ui(QtWidgets.QMainWindow):
             }
             return ydl_opts
 
+
 app = QtWidgets.QApplication(sys.argv)
+app.setStyleSheet(qdarkstyle.load_stylesheet())
 window = Ui()
 app.exec_()
