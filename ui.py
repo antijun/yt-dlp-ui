@@ -15,6 +15,7 @@ class Ui(QtWidgets.QMainWindow):
         uic.loadUi('form.ui', self)
         self.show()
         self.setWindowTitle("yt-dlp Media Downloader")
+        self.downloadButton.setEnabled(False)
         self.downloadButton.clicked.connect(self.startDownload)
         self.videoOnlyCheck.toggled.connect(self.video_exclusiveCheck)
         self.audioOnlyCheck.toggled.connect(self.audio_exclusiveCheck)
@@ -24,21 +25,33 @@ class Ui(QtWidgets.QMainWindow):
         quit.triggered.connect(self.closeEvent)
 
     def updateVideoData(self):
-        r = self.checkLinkValid()
-        urllib.request.urlretrieve(r['thumbnail'], "tempThumbnail.jpg")
-        thumbnail = QPixmap("tempThumbnail.jpg")
-        thumbnail = thumbnail.scaled(288, 162)
-        self.imageLabel.setPixmap(thumbnail)
-
-        URL = self.getLink()
-        ydl = YoutubeDL()
-        ydl_opts = {
-            'listformats': True,
-        }
-        with YoutubeDL(ydl_opts) as ydl:
-            ydl.download(URL)
-        self.formatSelectList.insertItem(0, "1080p (mp4)")
-        self.formatSelectList.insertItem(1, "1080p (webm)")
+        try:
+            r = self.checkLinkValid()
+            urllib.request.urlretrieve(r['thumbnail'], "tempThumbnail.jpg")
+            thumbnail = QPixmap("tempThumbnail.jpg")
+            thumbnail = thumbnail.scaled(288, 162)
+            self.imageLabel.setPixmap(thumbnail)
+            self.titleLabel.setText(r['title'])
+            self.titleLabel.setWordWrap(True)
+            self.lengthLabel.setText(("Duration: ") + r['duration_string'])
+            self.uploaderLabel.setText(("Uploader: ") + r['uploader'])
+            date = str(r['upload_date'])
+            splitDate = date[:4] + "-" + date[4:6] + "-" + date[6:8]
+            self.dateLabel.setText(("Upload Date: " ) + splitDate)
+            self.sourceLabel.setText(("Source Website: ") + r['extractor_key'])
+            URL = self.getLink()
+            ydl = YoutubeDL()
+            ydl_opts = {
+                'listformats': True,
+            }
+            with YoutubeDL(ydl_opts) as ydl:
+                ydl.download(URL)
+            self.formatSelectList.insertItem(0, "1080p (mp4)")
+            self.formatSelectList.insertItem(1, "1080p (webm)")
+        except:
+            pass
+        
+        
 
     def closeEvent(self, event):
         os.remove('tempThumbnail.jpg')
@@ -52,6 +65,7 @@ class Ui(QtWidgets.QMainWindow):
         ydl = YoutubeDL()
         try:
             infoList = ydl.extract_info(URL, download=False)
+            self.downloadButton.setEnabled(True)
             return infoList
         except:
             errorBox = QMessageBox()
