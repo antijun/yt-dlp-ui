@@ -8,7 +8,6 @@ from PyQt5 import QtWidgets, uic
 import urllib.request
 import qdarkstyle
 
-
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
@@ -21,8 +20,10 @@ class Ui(QtWidgets.QMainWindow):
         self.audioOnlyCheck.toggled.connect(self.audio_exclusiveCheck)
         self.setDownload.clicked.connect(self.set_downloadLocation)
         self.checkLinkButton.clicked.connect(self.updateVideoData)
+        self.setDownload.clicked.connect(self.set_downloadLocation)
         quit = QAction("Quit", self)
         quit.triggered.connect(self.closeEvent)
+        
 
     def updateVideoData(self):
         try:
@@ -51,8 +52,6 @@ class Ui(QtWidgets.QMainWindow):
         except:
             pass
         
-        
-
     def closeEvent(self, event):
         os.remove('tempThumbnail.jpg')
 
@@ -78,7 +77,11 @@ class Ui(QtWidgets.QMainWindow):
         URL = self.getLink()
         with YoutubeDL(self.getOptions(self.set_downloadLocation())) as ydl:
             ydl.download(URL)
+    
+    def specify_downloadLocation(self):
+        pass
 
+        
     def set_downloadLocation(self):
         location = 'downloads/%(title)s.%(ext)s'
         return location
@@ -120,6 +123,7 @@ class Ui(QtWidgets.QMainWindow):
                 'format': 'bestaudio/best',
                 'outtmpl': location,
                 'extractaudio': True,
+                "progress_hooks": [self.progressUpdate],
                 'audioformat': "mp3",
                 'noplaylist': True
             }
@@ -129,6 +133,7 @@ class Ui(QtWidgets.QMainWindow):
             ydl_opts = {
                 'format': 'bestvideo/best',
                 'outtmpl': location,
+                "progress_hooks": [self.progressUpdate],
                 'videoformat': "mp4",
                 'noplaylist': True
             }

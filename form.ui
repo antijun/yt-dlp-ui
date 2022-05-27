@@ -182,7 +182,7 @@
   <widget class="QLabel" name="lengthLabel">
    <property name="geometry">
     <rect>
-     <x>430</x>
+     <x>400</x>
      <y>60</y>
      <width>331</width>
      <height>20</height>
@@ -195,7 +195,7 @@
   <widget class="QLabel" name="uploaderLabel">
    <property name="geometry">
     <rect>
-     <x>430</x>
+     <x>400</x>
      <y>80</y>
      <width>331</width>
      <height>20</height>
@@ -208,7 +208,7 @@
   <widget class="QLabel" name="dateLabel">
    <property name="geometry">
     <rect>
-     <x>430</x>
+     <x>400</x>
      <y>100</y>
      <width>331</width>
      <height>16</height>
@@ -221,7 +221,7 @@
   <widget class="QLabel" name="sourceLabel">
    <property name="geometry">
     <rect>
-     <x>430</x>
+     <x>400</x>
      <y>120</y>
      <width>331</width>
      <height>16</height>
