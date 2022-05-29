@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets, uic
 import urllib.request
 import qdarkstyle
 
+
 class Ui(QtWidgets.QMainWindow):
     def __init__(self):
         super(Ui, self).__init__()
@@ -23,11 +24,39 @@ class Ui(QtWidgets.QMainWindow):
         self.setDownload.clicked.connect(self.set_downloadLocation)
         quit = QAction("Quit", self)
         quit.triggered.connect(self.closeEvent)
-        
 
     def updateVideoData(self):
-        try:
-            r = self.checkLinkValid()
+        # try:
+        r = self.checkLinkValid()
+
+        if r['extractor_key'] == 'YoutubeTab' or r['extractor_key'] == 'BandcampAlbum':
+            urllib.request.urlretrieve(
+                r['entries'][0]['thumbnail'], "tempThumbnail.jpg")
+            thumbnail = QPixmap("tempThumbnail.jpg")
+            thumbnail = thumbnail.scaled(288, 162)
+            self.imageLabel.setPixmap(thumbnail)
+            self.titleLabel.setText(r['title'])
+            self.titleLabel.setWordWrap(True)
+            if r['extractor_key'] == 'YoutubeTab':
+                self.lengthLabel.setText(
+                    ("Playlist Count: ") + str(r['playlist_count']))
+                self.uploaderLabel.setText(("Uploader: ") + r['uploader'])
+                date = str(r['modified_date'])
+                splitDate = date[:4] + "-" + date[4:6] + "-" + date[6:8]
+                self.dateLabel.setText(("Last Modified: ") + splitDate)
+                self.sourceLabel.setText(
+                    ("Source Website: ") + r['extractor_key'])
+            elif r['extractor_key'] == 'BandcampAlbum':
+                self.lengthLabel.setText(
+                    ("Track Count: ") + str(r['playlist_count']))
+                self.uploaderLabel.setText(
+                    ("Artist: ") + r['entries'][0]['uploader'])
+                date = str(r['entries'][0]['upload_date'])
+                splitDate = date[:4] + "-" + date[4:6] + "-" + date[6:8]
+                self.dateLabel.setText(("Release Date: ") + splitDate)
+                self.sourceLabel.setText(
+                    ("Source Website: ") + r['extractor_key'])
+        else:
             urllib.request.urlretrieve(r['thumbnail'], "tempThumbnail.jpg")
             thumbnail = QPixmap("tempThumbnail.jpg")
             thumbnail = thumbnail.scaled(288, 162)
@@ -38,20 +67,23 @@ class Ui(QtWidgets.QMainWindow):
             self.uploaderLabel.setText(("Uploader: ") + r['uploader'])
             date = str(r['upload_date'])
             splitDate = date[:4] + "-" + date[4:6] + "-" + date[6:8]
-            self.dateLabel.setText(("Upload Date: " ) + splitDate)
-            self.sourceLabel.setText(("Source Website: ") + r['extractor_key'])
-            URL = self.getLink()
-            ydl = YoutubeDL()
-            ydl_opts = {
-                'listformats': True,
-            }
-            with YoutubeDL(ydl_opts) as ydl:
-                ydl.download(URL)
-            self.formatSelectList.insertItem(0, "1080p (mp4)")
-            self.formatSelectList.insertItem(1, "1080p (webm)")
-        except:
-            pass
-        
+            self.dateLabel.setText(("Upload Date: ") + splitDate)
+            self.sourceLabel.setText(
+                ("Source Website: ") + r['extractor_key'])
+
+        self.formatSelectList.insertItem(0, "1080p (mp4)")
+        self.formatSelectList.insertItem(1, "1080p (webm)")
+
+        #URL = self.getLink()
+        #ydl = YoutubeDL()
+        # ydl_opts = {
+        #    'listformats': True,
+        # }
+        # with YoutubeDL(ydl_opts) as ydl:
+        #    ydl.download(URL)
+        # except:
+        # print("problem")
+
     def closeEvent(self, event):
         os.remove('tempThumbnail.jpg')
 
@@ -77,11 +109,10 @@ class Ui(QtWidgets.QMainWindow):
         URL = self.getLink()
         with YoutubeDL(self.getOptions(self.set_downloadLocation())) as ydl:
             ydl.download(URL)
-    
+
     def specify_downloadLocation(self):
         pass
 
-        
     def set_downloadLocation(self):
         location = 'downloads/%(title)s.%(ext)s'
         return location
