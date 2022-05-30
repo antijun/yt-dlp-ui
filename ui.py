@@ -28,7 +28,6 @@ class Ui(QtWidgets.QMainWindow):
     def updateVideoData(self):
         try:
             r = self.checkLinkValid()
-
             if r['extractor_key'] == 'YoutubeTab' or r['extractor_key'] == 'BandcampAlbum':
                 urllib.request.urlretrieve(
                     r['entries'][0]['thumbnail'], "tempThumbnail.jpg")
@@ -71,18 +70,17 @@ class Ui(QtWidgets.QMainWindow):
                 self.sourceLabel.setText(
                     ("Source Website: ") + r['extractor_key'])
 
-            self.formatSelectList.insertItem(0, "1080p (mp4)")
-            self.formatSelectList.insertItem(1, "1080p (webm)")
-
-        #URL = self.getLink()
-        #ydl = YoutubeDL()
-        # ydl_opts = {
-        #    'listformats': True,
-        # }
-        # with YoutubeDL(ydl_opts) as ydl:
-        #    ydl.download(URL)
+            #self.formatSelectList.insertItem(0, "1080p (mp4)")
+            #self.formatSelectList.insertItem(1, "1080p (webm)")
+            
         except:
             pass
+
+        def formatUpdate():
+            formats = r.get('formats', [r])
+            for i in formats:
+                self.formatSelectList.insertItem(0, i['format_id'] + " - " + i['format_note'] + " (" + i['ext'] + ")")
+        formatUpdate()
 
     def closeEvent(self, event):
         os.remove('tempThumbnail.jpg')
@@ -92,6 +90,7 @@ class Ui(QtWidgets.QMainWindow):
         return link
 
     def checkLinkValid(self):
+        self.formatSelectList.clear()
         URL = self.getLink()
         ydl = YoutubeDL()
         try:
