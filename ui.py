@@ -26,53 +26,53 @@ class Ui(QtWidgets.QMainWindow):
         quit.triggered.connect(self.closeEvent)
 
     def updateVideoData(self):
-        # try:
-        r = self.checkLinkValid()
+        try:
+            r = self.checkLinkValid()
 
-        if r['extractor_key'] == 'YoutubeTab' or r['extractor_key'] == 'BandcampAlbum':
-            urllib.request.urlretrieve(
-                r['entries'][0]['thumbnail'], "tempThumbnail.jpg")
-            thumbnail = QPixmap("tempThumbnail.jpg")
-            thumbnail = thumbnail.scaled(288, 162)
-            self.imageLabel.setPixmap(thumbnail)
-            self.titleLabel.setText(r['title'])
-            self.titleLabel.setWordWrap(True)
-            if r['extractor_key'] == 'YoutubeTab':
-                self.lengthLabel.setText(
-                    ("Playlist Count: ") + str(r['playlist_count']))
+            if r['extractor_key'] == 'YoutubeTab' or r['extractor_key'] == 'BandcampAlbum':
+                urllib.request.urlretrieve(
+                    r['entries'][0]['thumbnail'], "tempThumbnail.jpg")
+                thumbnail = QPixmap("tempThumbnail.jpg")
+                thumbnail = thumbnail.scaled(288, 162)
+                self.imageLabel.setPixmap(thumbnail)
+                self.titleLabel.setText(r['title'])
+                self.titleLabel.setWordWrap(True)
+                if r['extractor_key'] == 'YoutubeTab':
+                    self.lengthLabel.setText(
+                        ("Playlist Count: ") + str(r['playlist_count']))
+                    self.uploaderLabel.setText(("Uploader: ") + r['uploader'])
+                    date = str(r['modified_date'])
+                    splitDate = date[:4] + "-" + date[4:6] + "-" + date[6:8]
+                    self.dateLabel.setText(("Last Modified: ") + splitDate)
+                    self.sourceLabel.setText(
+                        ("Source Website: ") + r['extractor_key'])
+                elif r['extractor_key'] == 'BandcampAlbum':
+                    self.lengthLabel.setText(
+                        ("Track Count: ") + str(r['playlist_count']))
+                    self.uploaderLabel.setText(
+                        ("Artist: ") + r['entries'][0]['uploader'])
+                    date = str(r['entries'][0]['upload_date'])
+                    splitDate = date[:4] + "-" + date[4:6] + "-" + date[6:8]
+                    self.dateLabel.setText(("Release Date: ") + splitDate)
+                    self.sourceLabel.setText(
+                        ("Source Website: ") + r['extractor_key'])
+            else:
+                urllib.request.urlretrieve(r['thumbnail'], "tempThumbnail.jpg")
+                thumbnail = QPixmap("tempThumbnail.jpg")
+                thumbnail = thumbnail.scaled(288, 162)
+                self.imageLabel.setPixmap(thumbnail)
+                self.titleLabel.setText(r['title'])
+                self.titleLabel.setWordWrap(True)
+                self.lengthLabel.setText(("Duration: ") + r['duration_string'])
                 self.uploaderLabel.setText(("Uploader: ") + r['uploader'])
-                date = str(r['modified_date'])
+                date = str(r['upload_date'])
                 splitDate = date[:4] + "-" + date[4:6] + "-" + date[6:8]
-                self.dateLabel.setText(("Last Modified: ") + splitDate)
+                self.dateLabel.setText(("Upload Date: ") + splitDate)
                 self.sourceLabel.setText(
                     ("Source Website: ") + r['extractor_key'])
-            elif r['extractor_key'] == 'BandcampAlbum':
-                self.lengthLabel.setText(
-                    ("Track Count: ") + str(r['playlist_count']))
-                self.uploaderLabel.setText(
-                    ("Artist: ") + r['entries'][0]['uploader'])
-                date = str(r['entries'][0]['upload_date'])
-                splitDate = date[:4] + "-" + date[4:6] + "-" + date[6:8]
-                self.dateLabel.setText(("Release Date: ") + splitDate)
-                self.sourceLabel.setText(
-                    ("Source Website: ") + r['extractor_key'])
-        else:
-            urllib.request.urlretrieve(r['thumbnail'], "tempThumbnail.jpg")
-            thumbnail = QPixmap("tempThumbnail.jpg")
-            thumbnail = thumbnail.scaled(288, 162)
-            self.imageLabel.setPixmap(thumbnail)
-            self.titleLabel.setText(r['title'])
-            self.titleLabel.setWordWrap(True)
-            self.lengthLabel.setText(("Duration: ") + r['duration_string'])
-            self.uploaderLabel.setText(("Uploader: ") + r['uploader'])
-            date = str(r['upload_date'])
-            splitDate = date[:4] + "-" + date[4:6] + "-" + date[6:8]
-            self.dateLabel.setText(("Upload Date: ") + splitDate)
-            self.sourceLabel.setText(
-                ("Source Website: ") + r['extractor_key'])
 
-        self.formatSelectList.insertItem(0, "1080p (mp4)")
-        self.formatSelectList.insertItem(1, "1080p (webm)")
+            self.formatSelectList.insertItem(0, "1080p (mp4)")
+            self.formatSelectList.insertItem(1, "1080p (webm)")
 
         #URL = self.getLink()
         #ydl = YoutubeDL()
@@ -81,8 +81,8 @@ class Ui(QtWidgets.QMainWindow):
         # }
         # with YoutubeDL(ydl_opts) as ydl:
         #    ydl.download(URL)
-        # except:
-        # print("problem")
+        except:
+            pass
 
     def closeEvent(self, event):
         os.remove('tempThumbnail.jpg')
