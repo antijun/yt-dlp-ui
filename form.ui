@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>320</x>
-     <y>460</y>
+     <y>430</y>
      <width>351</width>
-     <height>61</height>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
@@ -32,7 +32,17 @@
      <x>10</x>
      <y>230</y>
      <width>291</width>
-     <height>290</height>
+     <height>145</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="formatSelectList2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>391</y>
+     <width>291</width>
+     <height>145</height>
     </rect>
    </property>
   </widget>
@@ -50,19 +60,9 @@
    <property name="geometry">
     <rect>
      <x>320</x>
-     <y>410</y>
+     <y>380</y>
      <width>100</width>
      <height>30</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="videoQualityCB">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>310</y>
-     <width>351</width>
-     <height>41</height>
     </rect>
    </property>
   </widget>
@@ -70,7 +70,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>390</y>
+     <y>340</y>
      <width>91</width>
      <height>22</height>
     </rect>
@@ -83,7 +83,7 @@
    <property name="geometry">
     <rect>
      <x>320</x>
-     <y>430</y>
+     <y>400</y>
      <width>351</width>
      <height>23</height>
     </rect>
@@ -99,7 +99,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>360</y>
+     <y>310</y>
      <width>81</width>
      <height>22</height>
     </rect>
@@ -125,7 +125,7 @@
    <property name="geometry">
     <rect>
      <x>370</x>
-     <y>530</y>
+     <y>510</y>
      <width>251</width>
      <height>21</height>
     </rect>

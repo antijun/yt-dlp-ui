@@ -22,9 +22,13 @@ class Ui(QtWidgets.QMainWindow):
         self.setDownload.clicked.connect(self.set_downloadLocation)
         self.checkLinkButton.clicked.connect(self.updateVideoData)
         self.setDownload.clicked.connect(self.set_downloadLocation)
+        self.formatSelectList.clicked.connect(self.getVideoF)
+        self.formatSelectList2.clicked.connect(self.getAudioF)
+        self.videoOnlyCheck.setDisabled(True)
+        self.audioOnlyCheck.setDisabled(True)
         quit = QAction("Quit", self)
         quit.triggered.connect(self.closeEvent)
-
+        
     def updateVideoData(self):
         try:
             r = self.checkLinkValid()
@@ -69,9 +73,6 @@ class Ui(QtWidgets.QMainWindow):
                 self.dateLabel.setText(("Upload Date: ") + splitDate)
                 self.sourceLabel.setText(
                     ("Source Website: ") + r['extractor_key'])
-
-            #self.formatSelectList.insertItem(0, "1080p (mp4)")
-            #self.formatSelectList.insertItem(1, "1080p (webm)")
             
         except:
             pass
@@ -79,8 +80,28 @@ class Ui(QtWidgets.QMainWindow):
         def formatUpdate():
             formats = r.get('formats', [r])
             for i in formats:
-                self.formatSelectList.insertItem(0, i['format_id'] + " - " + i['format_note'] + " (" + i['ext'] + ")")
+                if i['resolution'] != 'audio only':
+                    self.formatSelectList.insertItem(0, i['format_id'] + " - " + i['format_note'] + " (" + i['ext'] + ")")
+                elif i['resolution'] == 'audio only':
+                    self.formatSelectList2.insertItem(0, i['format_id'] + " - " + i['format_note'] + " (" + i['ext'] + ")")
+        
         formatUpdate()
+    
+    def getVideoF(self):
+        videoF = self.formatSelectList.currentItem().text()
+        videoF = videoF[0:3]
+        return videoF
+
+    def getAudioF(self):
+        audioF = self.formatSelectList2.currentItem().text()
+        audioF = audioF[0:3]
+        return audioF
+
+    def combineFormat(self):
+        videoF = self.getVideoF()
+        audioF = self.getAudioF()
+        comboF = videoF + "+" + audioF
+        return comboF
 
     def closeEvent(self, event):
         os.remove('tempThumbnail.jpg')
@@ -91,6 +112,8 @@ class Ui(QtWidgets.QMainWindow):
 
     def checkLinkValid(self):
         self.formatSelectList.clear()
+        self.videoOnlyCheck.setDisabled(False)
+        self.audioOnlyCheck.setDisabled(False)
         URL = self.getLink()
         ydl = YoutubeDL()
         try:
@@ -107,7 +130,7 @@ class Ui(QtWidgets.QMainWindow):
     def startDownload(self):
         URL = self.getLink()
         with YoutubeDL(self.getOptions(self.set_downloadLocation())) as ydl:
-            ydl.download(URL)
+           ydl.download(URL)
 
     def specify_downloadLocation(self):
         pass
@@ -118,11 +141,28 @@ class Ui(QtWidgets.QMainWindow):
 
     def video_exclusiveCheck(self):
         if self.videoOnlyCheck.isChecked() == True:
+            self.formatSelectList.setDisabled(False)
             self.audioOnlyCheck.setChecked(False)
+            self.formatSelectList2.setDisabled(True)
+            if self.formatSelectList2.currentItem() != None:
+                self.formatSelectList2.setCurrentItem(None)
+        elif self.videoOnlyCheck.isChecked() == False:
+            self.bothCheckOff()
 
     def audio_exclusiveCheck(self):
         if self.audioOnlyCheck.isChecked() == True:
+            self.formatSelectList2.setDisabled(False)
             self.videoOnlyCheck.setChecked(False)
+            self.formatSelectList.setDisabled(True)
+            if self.formatSelectList.currentItem() != None:
+                self.formatSelectList.setCurrentItem(None)
+        elif self.audioOnlyCheck.isChecked() == False:
+            self.bothCheckOff()
+    
+    def bothCheckOff(self):
+        if self.videoOnlyCheck.isChecked() == False and self.audioOnlyCheck.isChecked() == False:
+            self.formatSelectList.setDisabled(False)
+            self.formatSelectList2.setDisabled(False)
 
     def progressUpdate(self, response):
         if response["status"] == "downloading":
@@ -142,32 +182,35 @@ class Ui(QtWidgets.QMainWindow):
 
     def getOptions(self, location):
         if self.audioOnlyCheck.isChecked() == False and self.videoOnlyCheck.isChecked() == False:
+            comboF = self.combineFormat()
             ydl_opts = {
+                'format': comboF,
                 'outtmpl': location,
                 "progress_hooks": [self.progressUpdate],
+                'noplaylist': True
             }
             return ydl_opts
 
         elif self.audioOnlyCheck.isChecked() == True:
+            audioF = self.getAudioF()
             ydl_opts = {
-                'format': 'bestaudio/best',
+                'format': audioF,
                 'outtmpl': location,
                 'extractaudio': True,
                 "progress_hooks": [self.progressUpdate],
-                'audioformat': "mp3",
-                'noplaylist': True
             }
             return ydl_opts
 
         elif self.videoOnlyCheck.isChecked() == True:
+            videoF = self.getVideoF()
             ydl_opts = {
-                'format': 'bestvideo/best',
+                'format': videoF,
                 'outtmpl': location,
                 "progress_hooks": [self.progressUpdate],
-                'videoformat': "mp4",
                 'noplaylist': True
             }
             return ydl_opts
+        
 
 
 app = QtWidgets.QApplication(sys.argv)
