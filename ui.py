@@ -21,7 +21,6 @@ class Ui(QtWidgets.QMainWindow):
         self.audioOnlyCheck.toggled.connect(self.audio_exclusiveCheck)
         self.setDownload.clicked.connect(self.set_downloadLocation)
         self.checkLinkButton.clicked.connect(self.updateVideoData)
-        self.setDownload.clicked.connect(self.set_downloadLocation)
         self.formatSelectList.clicked.connect(self.getVideoF)
         self.formatSelectList2.clicked.connect(self.getAudioF)
         self.videoOnlyCheck.setDisabled(True)
@@ -30,6 +29,14 @@ class Ui(QtWidgets.QMainWindow):
         quit.triggered.connect(self.closeEvent)
         
     def updateVideoData(self):
+        def formatUpdate():
+            formats = r.get('formats', [r])
+            for i in formats:
+                if i['resolution'] != 'audio only':
+                    self.formatSelectList.insertItem(0, i['format_id'] + " - " + i['format_note'] + " (" + i['ext'] + ")")
+                elif i['resolution'] == 'audio only':
+                    self.formatSelectList2.insertItem(0, i['format_id'] + " - " + i['format_note'] + " (" + i['ext'] + ")")
+    
         try:
             r = self.checkLinkValid()
             if r['extractor_key'] == 'YoutubeTab' or r['extractor_key'] == 'BandcampAlbum':
@@ -59,6 +66,7 @@ class Ui(QtWidgets.QMainWindow):
                     self.dateLabel.setText(("Release Date: ") + splitDate)
                     self.sourceLabel.setText(
                         ("Source Website: ") + r['extractor_key'])
+        
             else:
                 urllib.request.urlretrieve(r['thumbnail'], "tempThumbnail.jpg")
                 thumbnail = QPixmap("tempThumbnail.jpg")
@@ -73,19 +81,11 @@ class Ui(QtWidgets.QMainWindow):
                 self.dateLabel.setText(("Upload Date: ") + splitDate)
                 self.sourceLabel.setText(
                     ("Source Website: ") + r['extractor_key'])
+                formatUpdate()
             
         except:
             pass
 
-        def formatUpdate():
-            formats = r.get('formats', [r])
-            for i in formats:
-                if i['resolution'] != 'audio only':
-                    self.formatSelectList.insertItem(0, i['format_id'] + " - " + i['format_note'] + " (" + i['ext'] + ")")
-                elif i['resolution'] == 'audio only':
-                    self.formatSelectList2.insertItem(0, i['format_id'] + " - " + i['format_note'] + " (" + i['ext'] + ")")
-        
-        formatUpdate()
     
     def getVideoF(self):
         videoF = self.formatSelectList.currentItem().text()
@@ -112,6 +112,7 @@ class Ui(QtWidgets.QMainWindow):
 
     def checkLinkValid(self):
         self.formatSelectList.clear()
+        self.formatSelectList2.clear()
         self.videoOnlyCheck.setDisabled(False)
         self.audioOnlyCheck.setDisabled(False)
         URL = self.getLink()
@@ -136,7 +137,8 @@ class Ui(QtWidgets.QMainWindow):
         pass
 
     def set_downloadLocation(self):
-        location = 'downloads/%(title)s.%(ext)s'
+        location = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
+        location = location + '/%(title)s.%(ext)s'
         return location
 
     def video_exclusiveCheck(self):
@@ -182,14 +184,23 @@ class Ui(QtWidgets.QMainWindow):
 
     def getOptions(self, location):
         if self.audioOnlyCheck.isChecked() == False and self.videoOnlyCheck.isChecked() == False:
-            comboF = self.combineFormat()
-            ydl_opts = {
-                'format': comboF,
-                'outtmpl': location,
-                "progress_hooks": [self.progressUpdate],
-                'noplaylist': True
-            }
-            return ydl_opts
+            try:
+                comboF = self.combineFormat()
+                ydl_opts = {
+                    'format': comboF,
+                    'outtmpl': location,
+                    "progress_hooks": [self.progressUpdate],
+                    'noplaylist': True
+                }
+                return ydl_opts
+            except:
+                ydl_opts = {
+                    'format': 'bestvideo+bestaudio',
+                    'outtmpl': location,
+                    "progress_hooks": [self.progressUpdate],
+                    'noplaylist': True
+                }
+                return ydl_opts
 
         elif self.audioOnlyCheck.isChecked() == True:
             audioF = self.getAudioF()
