@@ -19,7 +19,6 @@ class Ui(QtWidgets.QMainWindow):
         self.downloadButton.clicked.connect(self.startDownload)
         self.videoOnlyCheck.toggled.connect(self.video_exclusiveCheck)
         self.audioOnlyCheck.toggled.connect(self.audio_exclusiveCheck)
-        self.setDownload.clicked.connect(self.set_downloadLocation)
         self.checkLinkButton.clicked.connect(self.updateVideoData)
         self.formatSelectList.clicked.connect(self.getVideoF)
         self.formatSelectList2.clicked.connect(self.getAudioF)
@@ -96,7 +95,7 @@ class Ui(QtWidgets.QMainWindow):
         audioF = self.formatSelectList2.currentItem().text()
         audioF = audioF[0:3]
         return audioF
-
+    
     def combineFormat(self):
         videoF = self.getVideoF()
         audioF = self.getAudioF()
@@ -167,20 +166,37 @@ class Ui(QtWidgets.QMainWindow):
             self.formatSelectList2.setDisabled(False)
 
     def progressUpdate(self, response):
-        if response["status"] == "downloading":
-            speed = response["speed"]
-            if speed != None:
-                speed = int(speed)
-                speed = speed/1024**2
-                speed = round(speed, 2)
-            elif speed is None:
+        if 'playlist_count' in response['info_dict']:
+            downloaded = 0
+            if response["status"] == "downloading":
+                speed = response["speed"]
+                if speed != None:
+                    speed = int(speed)
+                    speed = speed/1024**2
+                    speed = round(speed, 2)
+                elif speed is None:
+                    pass
+                downloaded += 1
+            if downloaded == response['info_dict']['playlist_count']:
+                self.downloadProgress.setValue(100)
+                print('worked')
+            else:
                 pass
-            downloaded_percent = (
-                response["downloaded_bytes"]*100)/response["total_bytes"]
-            self.downloadProgress.setValue(downloaded_percent)
-            self.speedLabel.setText(str(speed) + " MiB/s")
-        elif response['status'] == "finished":
-            self.downloadProgress.setValue(100)
+        else:
+            if response["status"] == "downloading":
+                speed = response["speed"]
+                if speed != None:
+                    speed = int(speed)
+                    speed = speed/1024**2
+                    speed = round(speed, 2)
+                elif speed is None:
+                    pass
+                downloaded_percent = (
+                    response["downloaded_bytes"]*100)/response["total_bytes"]
+                self.downloadProgress.setValue(int(downloaded_percent))
+                self.speedLabel.setText(str(speed) + " MiB/s")
+            elif response['status'] == "finished":
+                self.downloadProgress.setValue(100)
 
     def getOptions(self, location):
         if self.audioOnlyCheck.isChecked() == False and self.videoOnlyCheck.isChecked() == False:
@@ -203,25 +219,42 @@ class Ui(QtWidgets.QMainWindow):
                 return ydl_opts
 
         elif self.audioOnlyCheck.isChecked() == True:
-            audioF = self.getAudioF()
-            ydl_opts = {
-                'format': audioF,
-                'outtmpl': location,
-                'extractaudio': True,
-                "progress_hooks": [self.progressUpdate],
-            }
-            return ydl_opts
+            try:
+                audioF = self.getAudioF()
+                ydl_opts = {
+                    'format': audioF,
+                    'outtmpl': location,
+                    'extractaudio': True,
+                    "progress_hooks": [self.progressUpdate],
+                }
+                return ydl_opts
+            except:
+                ydl_opts = {
+                    'format': 'bestaudio',
+                    'outtmpl': location,
+                    'extractaudio': True,
+                    "progress_hooks": [self.progressUpdate],
+                }
+                return ydl_opts
 
         elif self.videoOnlyCheck.isChecked() == True:
-            videoF = self.getVideoF()
-            ydl_opts = {
-                'format': videoF,
-                'outtmpl': location,
-                "progress_hooks": [self.progressUpdate],
-                'noplaylist': True
-            }
-            return ydl_opts
-        
+            try:
+                videoF = self.getVideoF()
+                ydl_opts = {
+                    'format': videoF,
+                    'outtmpl': location,
+                    "progress_hooks": [self.progressUpdate],
+                    'noplaylist': True
+                }
+                return ydl_opts
+            except:
+                ydl_opts = {
+                    'format': 'bestvideo',
+                    'outtmpl': location,
+                    'extractaudio': True,
+                    "progress_hooks": [self.progressUpdate],
+                }
+                return ydl_opts
 
 
 app = QtWidgets.QApplication(sys.argv)

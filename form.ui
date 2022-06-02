@@ -121,19 +121,6 @@
     <string>Check Link</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="setDownload">
-   <property name="geometry">
-    <rect>
-     <x>370</x>
-     <y>510</y>
-     <width>251</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Set Download Location</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="enterLink">
    <property name="geometry">
     <rect>
