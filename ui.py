@@ -260,4 +260,6 @@ class Ui(QtWidgets.QMainWindow):
 app = QtWidgets.QApplication(sys.argv)
 app.setStyleSheet(qdarkstyle.load_stylesheet())
 window = Ui()
-app.exec_()
+
+if __name__ == '__main__':
+    app.exec_()
