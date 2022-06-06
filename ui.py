@@ -231,6 +231,10 @@ class Ui(QtWidgets.QMainWindow):
             except:
                 ydl_opts = {
                     'format': 'bestaudio',
+                    'postprocessors': [{
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': 'mp3',
+                    }],
                     'outtmpl': location,
                     'extractaudio': True,
                     "progress_hooks": [self.progressUpdate],
