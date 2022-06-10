@@ -255,7 +255,6 @@ class Ui(QtWidgets.QMainWindow):
                 ydl_opts = {
                     'format': 'bestvideo',
                     'outtmpl': location,
-                    'extractaudio': True,
                     "progress_hooks": [self.progressUpdate],
                 }
                 return ydl_opts
